@@ -11,21 +11,21 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class Main {
 
     public static void main(String[] args) throws SQLException {
-//        if(args.length < 2) {
-//            throw new IllegalArgumentException("Where parameters?");
-//        }
-//        int nThreads = Integer.parseInt(args[0]);
-//        if(nThreads < 1 || nThreads > 8) {
-//            throw new IllegalArgumentException("The number of threads must not be less than 1 and greater than 8");
-//        }
+        if(args.length < 2) {
+            throw new IllegalArgumentException("Where parameters?");
+        }
+        int nThreads = Integer.parseInt(args[0]);
+        if(nThreads < 1 || nThreads > 8) {
+            throw new IllegalArgumentException("The number of threads must not be less than 1 and greater than 8");
+        }
 
         Geo2Request request = new Geo2Request();
-        SQLite sqLite = new SQLite("jdbc:sqlite:adresy.db", 8);
+        SQLite sqLite = new SQLite("jdbc:sqlite:adresy.db", nThreads);
         sqLite.createAddressTable();
         sqLite.createLocationTable();
-        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nThreads);
 
-        Observable.fromIterable(CSVReader.read("import.csv"))
+        Observable.fromIterable(CSVReader.read(args[1]))
                 .flatMap(location ->
                         Observable.just(location)
                                 .map(request::getLocation)
